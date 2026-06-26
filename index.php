@@ -3,15 +3,50 @@ $asg_name = "${asg_name}";
 $alb_dns = "${alb_dns}";
 $logo_url = "${logo_url}";
 
-function meta($path) {
-    $token = trim(shell_exec("curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600'"));
-    return trim(shell_exec("curl -s -H 'X-aws-ec2-metadata-token: $token' http://169.254.169.254/latest/meta-data/$path"));
+$opts = [
+    "http" => [
+        "method" => "PUT",
+        "header" => "X-aws-ec2-metadata-token-ttl-seconds: 21600\r\n",
+        "ignore_errors" => true
+    ]
+];
+
+$context = stream_context_create($opts);
+$token = file_get_contents("http://169.254.169.254/latest/api/token", false, $context);
+
+function putMetadata($path) {
+    global $token;
+    $opts = [
+        "http" => [
+            "method" => "PUT",
+            "header" => "X-aws-ec2-metadata-token: $token\r\n",
+            "ignore_errors" => true
+        ]
+    ];
+    
+    $context = stream_context_create($opts);
+    return file_get_contents("http://169.254.169.254/latest/meta-data/$path", false, $context);
 }
 
-$az = meta("placement/availability-zone");
-$instance_type = meta("instance-type");
-$instance_id = meta("instance-id");
-$private_ip = meta("local-ipv4");
+function getMetadata($path) {
+    global $token;
+    $opts = [
+        "http" => [
+            "method" => "GET",
+            "header" => "X-aws-ec2-metadata-token: $token\r\n",
+            "ignore_errors" => true
+        ]
+    ];
+    
+    $context = stream_context_create($opts);
+    return file_get_contents("http://169.254.169.254/latest/meta-data/$path", false, $context);
+}
+
+$asg_name = getMetadata("tags/instance/aws:autoscaling:groupName");
+$az = putMetadata("placement/availability-zone");
+$instance_type = putMetadata("instance-type");
+$instance_id = putMetadata("instance-id");
+$private_ip = putMetadata("local-ipv4");
 $region = substr($az, 0, -1);
 ?>
 
