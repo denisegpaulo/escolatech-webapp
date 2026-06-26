@@ -47,7 +47,7 @@
 
     // Inicia stress-ng asyncronamente e captura o PID
     $command = sprintf(
-        'nohup %s --all %d --maximize --cpu-method matrixprod --cpu-load %d --timeout %d > %s 2>&1 & echo $!',
+        'nohup %s --cpu %d --cpu-method matrixprod --cpu-load %d --timeout %d > %s 2>&1 & echo $!',
         escapeshellcmd($stress_ng_path),
         $cpu_workers,
         $cpu_load,
