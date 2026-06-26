@@ -27,7 +27,7 @@
 
     // Configurações do teste de carga de CPU
     $cpu_workers = 2;
-    $cpu_load = 90;
+    $cpu_load = 80;
     $duration_seconds = 360;
     $log_file = '/tmp/stress-ng.log';
 
@@ -47,7 +47,7 @@
 
     // Inicia stress-ng asyncronamente e captura o PID
     $command = sprintf(
-        'nohup %s --aggressive --cpu %d --cpu-load %d --cpu-method matrixprod --timeout %d > %s 2>&1 & echo $!',
+        'nohup %s --all %d --maximize --cpu-load %d --timeout %d > %s 2>&1 & echo $!',
         escapeshellcmd($stress_ng_path),
         $cpu_workers,
         $cpu_load,
