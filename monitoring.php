@@ -12,8 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-const MIN_INSTANCES = 2;
-
 $instance_type = $_POST['instance_type'] ?? null;
 $instance_id = $_POST['instance_id'] ?? null;
 $private_ip = $_POST['private_ip'] ?? null;
@@ -64,8 +62,8 @@ $group = $asg["AutoScalingGroups"][0];
 
 $desired = $group["DesiredCapacity"] ?? "N/A";
 $instances = $group["Instances"] ?? [];
-$min = $group["MinSize"] ?? "N/A";
 $max = $group["MaxSize"] ?? "N/A";
+$min = $group["MinSize"] ?? 1;
 
 $running_instances = array_filter($instances, function ($instance) {
     return isset($instance["LifecycleState"]) && $instance["LifecycleState"] === "InService";
@@ -73,11 +71,11 @@ $running_instances = array_filter($instances, function ($instance) {
 
 $running = count($running_instances);
 
-$status_msg = ($running >= MIN_INSTANCES)
+$status_msg = ($running >= $min)
     ? "Auto Scaling está funcionando!"
     : "Auto Scaling ainda não demonstrou escala.";
 
-$status_class = ($running >= MIN_INSTANCES) ? "success" : "error";
+$status_class = ($running >= $min) ? "success" : "error";
 
 $instance_metrics = [];
 
