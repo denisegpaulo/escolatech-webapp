@@ -88,7 +88,7 @@ foreach ($instances as $instance) {
     $current_instance_id = $instance["InstanceId"];
 
     $end = gmdate("Y-m-d\TH:i:s\Z");
-    $start = gmdate("Y-m-d\TH:i:s\Z", time() - 300);
+    $start = gmdate("Y-m-d\TH:i:s\Z", time() - 5);
 
     $dimension = escapeshellarg("Name=InstanceId,Value=$current_instance_id");
 
